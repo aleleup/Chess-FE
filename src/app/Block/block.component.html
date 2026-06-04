@@ -1,9 +1,7 @@
-@if (blockColor() === "WHITE"){
-<div class="block whiteBlock" (click)="showPosOnClick()" >
-   Block {{content()}}
-</div>
-} @else{
-<div class="block blackBlock" (click)="showPosOnClick() " >
+
+<div class="block whiteBlock" (click)="showPosOnClick()"
+    [style.background-color]="blockColor()  === 'WHITE' ? '#F5F5DC' : '#111111'"
+    [style.color]="blockColor()  === 'WHITE' ? 'black' : 'white'"
+>
     {{content()}}
 </div>
-}

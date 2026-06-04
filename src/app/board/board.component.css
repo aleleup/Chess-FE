@@ -1,0 +1,9 @@
+.row{
+    display: flex;
+    flex-direction: row;
+}
+
+.board{
+    display: grid ;
+     place-items: center
+}

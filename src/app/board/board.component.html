@@ -1,0 +1,11 @@
+<div>
+    @for(row of boardStructure; track boardStructure.indexOf(row)) {
+        <div class="row">
+            @for(blockData of row; track $index) { 
+                <block [blockColor]="blockData.color" [realPos]="blockData.realPos" (positionSetter)="handlePositionClicked($event)"/>
+            }
+
+        </div>
+
+    }
+</div>
