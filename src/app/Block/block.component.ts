@@ -1,5 +1,5 @@
 import { Component, input, signal, output } from "@angular/core";
-import { blockData } from "../types";
+import { blockData  } from "../types";
 
 @Component({
     selector: 'block',
@@ -8,13 +8,17 @@ import { blockData } from "../types";
 })
 export class Block {
     realPos = input<Array<number>>([]);
-    content = signal<string>("X");
+    contentInput = input<string>("")
+    content = signal<string>(this.contentInput());
     blockColor = input<string>("");
     positionSetter = output<blockData>()
 
-    changeContent = (piece: string ) => {this.content.set(piece)}
+    ngOnInit() {
+        this.content.set(this.contentInput());
+    }
 
     showPosOnClick = () => {
+        
         console.log(this.realPos())
         this.positionSetter.emit({
             realPos: this.realPos(),
