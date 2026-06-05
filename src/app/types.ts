@@ -1,12 +1,11 @@
 import { WritableSignal } from "@angular/core";
 
-export interface blockData {
-    realPos: Array<number>, content: WritableSignal<string>
-}
+
 
 export interface preBlock {
     color: string, 
     realPos: Array<number>,
-    content: string
+    content: WritableSignal<string>,
+    isSelected: WritableSignal<boolean>
 
 }

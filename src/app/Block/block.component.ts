@@ -1,5 +1,4 @@
-import { Component, input, signal, output } from "@angular/core";
-import { blockData  } from "../types";
+import { Component, input, signal, output, WritableSignal } from "@angular/core";
 
 @Component({
     selector: 'block',
@@ -7,23 +6,15 @@ import { blockData  } from "../types";
     styleUrl: './block.component.css'
 })
 export class Block {
-    realPos = input<Array<number>>([]);
-    contentInput = input<string>("")
-    content = signal<string>(this.contentInput());
+    realPos = input<number[]>([]);
+    content = input<WritableSignal<string>>(signal<string>(""))
     blockColor = input<string>("");
-    positionSetter = output<blockData>()
+    isSelected = input<WritableSignal<boolean>>(signal<boolean>(false));
+    positionSetter = output<number[]>()
 
-    ngOnInit() {
-        this.content.set(this.contentInput());
-    }
-
-    showPosOnClick = () => {
-        
+    showPosOnClick() {
         console.log(this.realPos())
-        this.positionSetter.emit({
-            realPos: this.realPos(),
-            content: this.content,
-        });
+        this.positionSetter.emit(this.realPos());
     };
 
 };

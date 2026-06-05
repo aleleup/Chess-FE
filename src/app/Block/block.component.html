@@ -2,6 +2,7 @@
 <div class="block whiteBlock" (click)="showPosOnClick()"
     [style.background-color]="blockColor()  === 'WHITE' ? '#F5F5DC' : '#111111'"
     [style.color]="blockColor()  === 'WHITE' ? 'black' : 'white'"
+    [style.border]="isSelected()() ? '2px solid gold ' : '' "
 >
-    {{content()}}
+    {{content()()}}
 </div>

@@ -1,12 +1,15 @@
-<div>
+<div (contextmenu)="dropPrevData($event)">
     @for(row of boardStructure; track boardStructure.indexOf(row)) {
         <div class="row">
             @for(blockData of row; track $index) { 
-                <block [blockColor]="blockData.color" [realPos]="blockData.realPos" [contentInput]="blockData.content" 
-                (positionSetter)="handlePositionClicked($event)"/>
+                <block [blockColor]="blockData.color" [realPos]="blockData.realPos" [content]="blockData.content" [isSelected]="blockData.isSelected"
+                (positionSetter)="handlePositionClicked($event) "/>
             }
 
         </div>
 
     }
 </div>
+
+<button (click)="movePiece([1,0], [2,0])">Move Piece</button>
+
