@@ -1,0 +1,31 @@
+:host {
+    display: block;
+    position: fixed;  
+    height: 300px;
+    top:112px;
+    left: 108px;
+    width: 200px;
+    height: 200px;
+    max-width: 200px;
+    max-height: 200px;
+
+    background-color: black;
+    color: white;
+    display: grid;
+    place-items: center;
+}
+
+.piece-to-select{
+    border: 1px solid white;
+    background: #000;
+    color: white; 
+    width:100px;
+    height: 100px;
+
+}
+
+/* .piece-to-select :hover {
+    background:white;
+    color: black; 
+    
+} */

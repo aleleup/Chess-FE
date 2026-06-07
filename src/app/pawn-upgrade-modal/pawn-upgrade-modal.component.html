@@ -1,0 +1,9 @@
+<div>
+    @for(contentArr of content ; track $index) {
+        <div>
+            @for (pieceToSelect of contentArr; track $index) {
+                <button class="piece-to-select" (click)="handlePieceSelected(pieceToSelect)"> {{pieceToSelect}} </button>
+            }
+        </div>
+    }
+</div>

@@ -1,22 +1,25 @@
 import { Component, input, signal, WritableSignal } from '@angular/core';
-import { preBlock } from '../types';
+import { preBlock, Message } from '../types';
 import { Block } from '../Block/block.component';
+import { PawnUpgradeModalComponent } from '../pawn-upgrade-modal/pawn-upgrade-modal.component';
 
 @Component({
   selector: 'board',
-  imports: [Block],
+  imports: [Block, PawnUpgradeModalComponent],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css'
 })
+
 export class Board {
     teamId = input<number>();
     fromBlock = signal<preBlock | null>(null);
     contentSelected: string = '';
 	boardStructure: preBlock[][] = [];
 	typeOfMovement: string = "";
-	// boardToRender: Array<Array<HTMLElement>> = []
+	pawnUpgrade = signal<string | null>(null);
+	showPawnUpgradeModal = signal<boolean>(false);
+
 	ngOnInit() {
-		// TODO: construct board for black team
 		for(let i = 0; i < 8; i++){
 			const row: Array<preBlock> = [];
 			const colors = ["WHITE", "BLACK"];
@@ -36,12 +39,11 @@ export class Board {
 			this.boardStructure.reverse()
 		}			
 		this.setPiecesInBoard()
-
 		console.log(this.boardStructure)
 
 	}  
     
-    handlePositionClicked(realPos: number[]){
+    async handlePositionClicked(realPos: number[]){
 		let relativePos = realPos;
 		if (this.teamId() === 1) relativePos = this.reverseVector(realPos);
       	console.log("New pos recived: " , realPos, relativePos)
@@ -51,25 +53,41 @@ export class Board {
 			this.fromBlock.set(blockSelected)
 			blockSelected.isSelected.set(true)	
 		}
+		// if (this.fromBlock() !== null &&this.fromBlock() === blockSelected) {
+		// 	this.dropPrevData(null)
+		// }
 		else {
+			
 			this.setTypeOfMovement(blockSelected);
+			if (this.typeOfMovement === "PAWN_UPGRADE") {
+				this.showPawnUpgradeModal.set(true)
+				await this.waitToCloseModal()
+			}
+			const body: Message = {
+				typeOfMove: this.typeOfMovement,
+				currentPos: this.fromBlock()?.realPos || [], //Ts sucks
+ 				newPos: blockSelected.realPos,
+				pawnUpgrade: this.pawnUpgrade(),
+				playerId: this.teamId() || 0,
+				timeStamp: 100
+			} 
+			console.log("BODY: ", body)
+			// If response.wasLegalMove == true
 			blockSelected.content.set(this.fromBlock()?.content() || "");
 			this.fromBlock()?.content.set("");
 			this.fromBlock()?.isSelected.set(false);
 			this.fromBlock.set(null)
 		};
 
-	  //   position.content.set("X") // Accesing position data!!!
     }
 
-	dropPrevData(event: MouseEvent) {
+	dropPrevData(event: MouseEvent | null) {
 		console.log("DROP FROM DATA");
-		event.preventDefault();
+		event?.preventDefault();
 		this.fromBlock()?.isSelected.set(false);
 		this.fromBlock.set(null);
 	}
 
-	// APPLY REFACTOR.
 	movePiece(from: Array<number>, to: Array<number>) {
 		
 		this.boardStructure[to[0]][to[1]].content.set(this.boardStructure[from[0]][from[1]].content())		
@@ -123,4 +141,11 @@ export class Board {
 
 	}
 
+	async waitToCloseModal() {
+		const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+		while(this.showPawnUpgradeModal()) {
+			console.log("Waiting user response")
+			await wait(500)
+		}
+	}
 }
