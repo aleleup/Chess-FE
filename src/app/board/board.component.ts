@@ -1,8 +1,8 @@
-import { Component, input, signal, WritableSignal } from '@angular/core';
-import { preBlock, Message } from '../types';
+import { Component, input, signal, inject } from '@angular/core';
+import { preBlock, Message, BrodCastMessage } from '../types';
 import { Block } from '../Block/block.component';
 import { PawnUpgradeModalComponent } from '../pawn-upgrade-modal/pawn-upgrade-modal.component';
-
+import { WebsocketService } from '../../Services/WebSocket.service';
 @Component({
   selector: 'board',
   imports: [Block, PawnUpgradeModalComponent],
@@ -11,13 +11,15 @@ import { PawnUpgradeModalComponent } from '../pawn-upgrade-modal/pawn-upgrade-mo
 })
 
 export class Board {
-    teamId = input<number>();
-    fromBlock = signal<preBlock | null>(null);
-    contentSelected: string = '';
+	teamId = input<number>();
+	fromBlock = signal<preBlock | null>(null);
+	contentSelected: string = '';
 	boardStructure: preBlock[][] = [];
 	typeOfMovement: string = "";
 	pawnUpgrade = signal<string | null>(null);
 	showPawnUpgradeModal = signal<boolean>(false);
+	showWarning = signal<boolean>(false);
+	wsService = inject(WebsocketService	);
 
 	ngOnInit() {
 		for(let i = 0; i < 8; i++){
@@ -39,8 +41,7 @@ export class Board {
 			this.boardStructure.reverse()
 		}			
 		this.setPiecesInBoard()
-		console.log(this.boardStructure)
-
+		this.wsService.setWebSockerRequirements(this.handleListenToMessage, "/board")
 	}  
     
     async handlePositionClicked(realPos: number[]){
@@ -57,25 +58,41 @@ export class Board {
 		// 	this.dropPrevData(null)
 		// }
 		else {
-			
+			// Identify what the user wants to do
 			this.setTypeOfMovement(blockSelected);
 			if (this.typeOfMovement === "PAWN_UPGRADE") {
+				// Await until the user selected the pawn upgrade
 				this.showPawnUpgradeModal.set(true)
 				await this.waitToCloseModal()
 			}
+			// Moveing the piece (if it is not a legal move, then we are moveing things as they were)
+			// This to give the clear impression that what the user did was wrong
+			const blockSelectedPrevContent: string = blockSelected.content();
+			blockSelected.content.set(this.fromBlock()?.content() || "");
+			this.fromBlock()?.content.set("");
+			this.fromBlock()?.isSelected.set(false);
+
+			// Sending the message to the webSocket.
 			const body: Message = {
 				typeOfMove: this.typeOfMovement,
 				currentPos: this.fromBlock()?.realPos || [], //Ts sucks
- 				newPos: blockSelected.realPos,
+				newPos: blockSelected.realPos,
 				pawnUpgrade: this.pawnUpgrade(),
 				playerId: this.teamId() || 0,
 				timeStamp: 100
 			} 
-			console.log("BODY: ", body)
-			// If response.wasLegalMove == true
-			blockSelected.content.set(this.fromBlock()?.content() || "");
-			this.fromBlock()?.content.set("");
-			this.fromBlock()?.isSelected.set(false);
+			const response: BrodCastMessage = await this.sendBodyToServer(body)
+			console.log("SERVER RESPONSE: ", response)
+			if (!response.wasLegalMove) {
+				const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+				this.showWarning.set(true)
+				await wait(750);
+				this.showWarning.set(false)
+
+				this.fromBlock()?.content.set(blockSelected.content());
+				blockSelected.content.set(blockSelectedPrevContent);
+
+			}
 			this.fromBlock.set(null)
 		};
 
@@ -141,11 +158,30 @@ export class Board {
 
 	}
 
+
 	async waitToCloseModal() {
 		const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 		while(this.showPawnUpgradeModal()) {
 			console.log("Waiting user response")
 			await wait(500)
 		}
+	}
+
+	async sendBodyToServer(body: Message): Promise<BrodCastMessage> {
+		console.log("BODY: ", body);
+		this.wsService.sendMessage(body)
+		return {
+			wasLegalMove: true,
+			gameOverData: null,
+			previousPos: body.currentPos,
+			newPos: body.newPos,
+			pawnUpgrade: "",
+			playerTurn: (body.playerId + 1) % 2
+		}
+	}
+
+
+	handleListenToMessage(message: Object) {
+		console.log("Message from the server in Board: ", message)
 	}
 }

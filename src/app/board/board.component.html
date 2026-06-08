@@ -11,11 +11,11 @@
 
         }
     </div>
-
-    <button (click)="movePiece([1,0], [2,0])">Move Piece</button>
+    @if (showWarning()) { <span> Not legal Move!! </span> } 
+    <!-- TODO add style  -->
     @if(showPawnUpgradeModal()) {
         <div class="modal">
-            <pawn-upgrade-modal [showModal]="showPawnUpgradeModal" [pieceSelected]="pawnUpgrade"/>
+            <pawn-upgrade-modal [showModal]="showPawnUpgradeModal" [pieceSelected]="pawnUpgrade" [teamId]="teamId()"/>
         </div>
     }
 </div>

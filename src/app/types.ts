@@ -8,7 +8,20 @@ export interface Message {
     playerId: number,
     timeStamp: number,
 }
+export interface BrodCastMessage {
+    wasLegalMove: boolean,
+    playerTurn: number,
+    gameOverData: GameOverData | null,
+    previousPos: number[],
+    newPos: number[],
+    pawnUpgrade: string,
+}
 
+export interface GameOverData {
+    isTie: boolean,
+    winnerId: number,
+    reasson: string
+}
 export interface preBlock {
     color: string, 
     realPos: Array<number>,
@@ -16,3 +29,5 @@ export interface preBlock {
     isSelected: WritableSignal<boolean>
 
 }
+
+export type ListenerFunction = (x: Object) => void
