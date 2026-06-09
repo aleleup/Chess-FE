@@ -19,7 +19,7 @@ export class Board {
 	toBlockPrevContent = ""
 
 	contentSelected: string = '';
-	boardStructure: preBlock[][] = [];
+	boardStructure: (preBlock)[][] = [];
 	typeOfMovement: string = "";
 	pawnUpgrade = signal<string | null>(null);
 	showPawnUpgradeModal = signal<boolean>(false);
@@ -110,10 +110,11 @@ export class Board {
 			// This to give the clear impression that what the user did was wrong
 			this.toBlock.set(blockSelected)
 			this.toBlockPrevContent = blockSelected.content();
-			blockSelected.content.set(this.fromBlock()?.content() || "");
-			this.fromBlock()?.content.set("");
+			if(this.typeOfMovement === "MOVE"){	
+				blockSelected.content.set(this.fromBlock()?.content() || "");
+				this.fromBlock()?.content.set("");
+			}
 			this.fromBlock()?.isSelected.set(false);
-
 			// Sending the message to the webSocket.
 			const body: Message = {
 				typeOfMove: this.typeOfMovement,
@@ -134,20 +135,41 @@ export class Board {
 					this.showWarning.set(true)
 					await wait(750);
 					this.showWarning.set(false)
-					const fromBlockContent: string = this.toBlock()?.content() || "";
-					this.fromBlock()?.content.set(fromBlockContent);
-					this.toBlock()?.content.set(this.toBlockPrevContent);
-
+					if (this.typeOfMovement === "MOVE"){
+						const fromBlockContent: string = this.toBlock()?.content() || "";
+						this.fromBlock()?.content.set(fromBlockContent);
+						this.toBlock()?.content.set(this.toBlockPrevContent);
+					}
+						
 			}
-			this.fromBlock.set(null)
-			this.toBlock.set(null)
-			this.toBlockPrevContent = ""
+			// else {
+				
+			// }
+			
 		}
 		else {
 			if (msg.wasLegalMove){
 				this.movePiece(msg.previousPos, msg.newPos)
 			}
 		}
+
+		if (msg.wasLegalMove && this.typeOfMovement === "CASTLE" && msg.castelingData !== null) {
+					const kingPos = msg.castelingData.kingPos;
+					const rookPos = msg.castelingData.rookPos;
+
+					// this.boardStructure[kingPos[0]][kingPos[1]].content.set(this.fromBlock()?.content() || "");
+					this.movePiece(this.fromBlock()?.realPos || [], kingPos)
+					// this.boardStructure[rookPos[0]][rookPos[1]].content.set(this.toBlock()?.content() || "");
+					this.movePiece(this.toBlock()?.realPos || [], rookPos)
+
+					this.fromBlock()?.content.set("");
+					this.toBlock()?.content.set("");
+
+
+				}
+		this.fromBlock.set(null)
+		this.toBlock.set(null)
+		this.toBlockPrevContent = ""
 		this.isMyTurn.set(msg.playerTurn === this.teamId())
 		
 	}
@@ -220,17 +242,10 @@ export class Board {
 		}
 	}
 
-	async sendBodyToServer(body: Message): Promise<BrodCastMessage> {
+	async sendBodyToServer(body: Message) {
 		console.log("BODY: ", body);
 		this.wsService.sendMessage(body)
-		return {
-			wasLegalMove: true,
-			gameOverData: null,
-			previousPos: body.currentPos,
-			newPos: body.newPos,
-			pawnUpgrade: "",
-			playerTurn: (body.playerId + 1) % 2
-		}
+		
 	}
 
 	isBrodcastMessage(msg: any): msg is BrodCastMessage {
@@ -240,7 +255,8 @@ export class Board {
 			'gameOverData' in msg &&
 			'previousPos' in msg &&
 			'newPos' in msg &&
-			'pawnUpgrade' in msg 
+			'pawnUpgrade' in msg &&
+			'castelingData' in msg
 		)
 	}
 	isConnectionMessage(msg: any): msg is ConnectionMessage {

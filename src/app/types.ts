@@ -16,6 +16,7 @@ export interface BrodCastMessage {
     previousPos: number[],
     newPos: number[],
     pawnUpgrade: string,
+    castelingData: CastelingData | null
 }
 
 export interface GameOverData {
@@ -37,4 +38,9 @@ export interface ConnectionMessage {
     success: boolean,
     id: number,
     message: string 
+}
+
+export interface CastelingData {
+    kingPos: number[],
+    rookPos: number[]
 }
