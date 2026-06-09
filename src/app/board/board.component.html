@@ -1,21 +1,27 @@
-<div>
-    <div (contextmenu)="dropPrevData($event)">
-        @for(row of boardStructure; track boardStructure.indexOf(row)) {
-            <div class="row">
-                @for(blockData of row; track $index) { 
-                    <block [blockColor]="blockData.color" [realPos]="blockData.realPos" [content]="blockData.content" [isSelected]="blockData.isSelected"
-                    (positionSetter)="handlePositionClicked($event) "/>
-                }
+@if(showBoard()){
+    <div (disable)="isMyTurn()">
+        <div (contextmenu)="dropPrevData($event)">
+            @for(row of boardStructure; track boardStructure.indexOf(row)) {
+                <div class="row">
+                    @for(blockData of row; track $index) { 
+                        <block [blockColor]="blockData.color" [realPos]="blockData.realPos" [content]="blockData.content" [isSelected]="blockData.isSelected"
+                        (positionSetter)="handlePositionClicked($event) "/>
+                    }
 
+                </div>
+
+            }
+        </div>
+        @if (showWarning()) { <span> Not legal Move!! </span> } 
+        <!-- TODO add style  -->
+        @if(showPawnUpgradeModal()) {
+            <div class="modal">
+                <pawn-upgrade-modal [showModal]="showPawnUpgradeModal" [pieceSelected]="pawnUpgrade" [teamId]="teamId()"/>
             </div>
-
         }
     </div>
-    @if (showWarning()) { <span> Not legal Move!! </span> } 
-    <!-- TODO add style  -->
-    @if(showPawnUpgradeModal()) {
-        <div class="modal">
-            <pawn-upgrade-modal [showModal]="showPawnUpgradeModal" [pieceSelected]="pawnUpgrade" [teamId]="teamId()"/>
-        </div>
-    }
-</div>
+
+}
+@else{
+    <span> {{connectionMessage()}} </span>
+}

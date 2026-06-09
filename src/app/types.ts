@@ -1,3 +1,4 @@
+import { EmptyExpr } from "@angular/compiler";
 import { WritableSignal } from "@angular/core";
 
 export interface Message {
@@ -30,4 +31,10 @@ export interface preBlock {
 
 }
 
-export type ListenerFunction = (x: Object) => void
+export type ListenerFunction = (x: any) => void
+
+export interface ConnectionMessage {
+    success: boolean,
+    id: number,
+    message: string 
+}
