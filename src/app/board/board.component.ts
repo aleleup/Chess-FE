@@ -142,10 +142,9 @@ export class Board {
 					}
 						
 			}
-			// else {
-				
-			// }
-			
+			this.fromBlock.set(null)
+			this.toBlock.set(null)
+			this.toBlockPrevContent = ""
 		}
 		else {
 			if (msg.wasLegalMove){
@@ -153,23 +152,14 @@ export class Board {
 			}
 		}
 
-		if (msg.wasLegalMove && this.typeOfMovement === "CASTLE" && msg.castelingData !== null) {
-					const kingPos = msg.castelingData.kingPos;
-					const rookPos = msg.castelingData.rookPos;
+		if (msg.prevTypeOfMove === "CASTLE" && msg.castelingData !== null) {
+				const kingPos = msg.castelingData.kingPos;
+				const rookPos = msg.castelingData.rookPos;
 
-					// this.boardStructure[kingPos[0]][kingPos[1]].content.set(this.fromBlock()?.content() || "");
-					this.movePiece(this.fromBlock()?.realPos || [], kingPos)
-					// this.boardStructure[rookPos[0]][rookPos[1]].content.set(this.toBlock()?.content() || "");
-					this.movePiece(this.toBlock()?.realPos || [], rookPos)
-
-					this.fromBlock()?.content.set("");
-					this.toBlock()?.content.set("");
-
-
+				this.movePiece(msg.newPos || [], rookPos)
+				this.movePiece(msg.previousPos|| [], kingPos)
 				}
-		this.fromBlock.set(null)
-		this.toBlock.set(null)
-		this.toBlockPrevContent = ""
+		
 		this.isMyTurn.set(msg.playerTurn === this.teamId())
 		
 	}
@@ -256,7 +246,9 @@ export class Board {
 			'previousPos' in msg &&
 			'newPos' in msg &&
 			'pawnUpgrade' in msg &&
-			'castelingData' in msg
+			'castelingData' in msg &&
+			'prevTypeOfMove' in msg
+
 		)
 	}
 	isConnectionMessage(msg: any): msg is ConnectionMessage {
