@@ -29,6 +29,10 @@ export class Board {
 	connectionMessage = signal<string>("");
 
 	isMyTurn = signal<boolean>(false);
+
+	MOVE = "MOVE";
+	CASTLE = "CASTLE";
+	PAWN_UPGRADE = "PAWN_UPGRADE";
 	constructor() {
 		this.wsService.init("/board");
 
@@ -101,7 +105,7 @@ export class Board {
 		else {
 			// Identify what the user wants to do
 			this.setTypeOfMovement(blockSelected);
-			if (this.typeOfMovement === "PAWN_UPGRADE") {
+			if (this.typeOfMovement === this.PAWN_UPGRADE) {
 				// Await until the user selected the pawn upgrade
 				this.showPawnUpgradeModal.set(true)
 				await this.waitToCloseModal()
@@ -110,7 +114,7 @@ export class Board {
 			// This to give the clear impression that what the user did was wrong
 			this.toBlock.set(blockSelected)
 			this.toBlockPrevContent = blockSelected.content();
-			if(this.typeOfMovement === "MOVE"){	
+			if(this.typeOfMovement === this.MOVE){	
 				blockSelected.content.set(this.fromBlock()?.content() || "");
 				this.fromBlock()?.content.set("");
 			}
@@ -129,39 +133,40 @@ export class Board {
 
     }
 	async handleBrodcastMessage(msg: BrodCastMessage){
-		if (this.isResponseToMyMessage(msg.playerTurn)){
-			if (!msg.wasLegalMove) {
-					const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-					this.showWarning.set(true)
-					await wait(750);
-					this.showWarning.set(false)
-					if (this.typeOfMovement === "MOVE"){
-						const fromBlockContent: string = this.toBlock()?.content() || "";
-						this.fromBlock()?.content.set(fromBlockContent);
-						this.toBlock()?.content.set(this.toBlockPrevContent);
-					}
-						
+		if (msg.prevTypeOfMove === this.MOVE){
+			if (this.isResponseToMyMessage(msg.playerTurn) && !msg.wasLegalMove){
+				
+				await this.showErrorSignal()
+				// Roll back to previous state.
+				const fromBlockContent: string = this.toBlock()?.content() || "";
+				this.fromBlock()?.content.set(fromBlockContent);
+				this.toBlock()?.content.set(this.toBlockPrevContent);
+				
 			}
-			this.fromBlock.set(null)
-			this.toBlock.set(null)
-			this.toBlockPrevContent = ""
-		}
-		else {
-			if (msg.wasLegalMove){
-				this.movePiece(msg.previousPos, msg.newPos)
-			}
-		}
+			else if (!this.isResponseToMyMessage(msg.playerTurn) && msg.wasLegalMove) this.movePiece(msg.previousPos, msg.newPos) 
 
-		if (msg.prevTypeOfMove === "CASTLE" && msg.castelingData !== null) {
+		}	
+
+
+		if (msg.prevTypeOfMove === this.CASTLE) {
+			if ( msg.castelingData === null) this.isResponseToMyMessage(msg.playerTurn) && await this.showErrorSignal() // ¬msg.castelingData  <==> ¬msg.wasLegalMove
+			else {
 				const kingPos = msg.castelingData.kingPos;
 				const rookPos = msg.castelingData.rookPos;
+				this.movePiece(msg.newPos || [], rookPos);
+				this.movePiece(msg.previousPos|| [], kingPos);
+			}
+		}
 
-				this.movePiece(msg.newPos || [], rookPos)
-				this.movePiece(msg.previousPos|| [], kingPos)
-				}
-		
-		this.isMyTurn.set(msg.playerTurn === this.teamId())
-		
+		if (msg.prevTypeOfMove === this.PAWN_UPGRADE && msg.wasLegalMove && msg.pawnUpgrade !== null) {
+			if (!msg.wasLegalMove && this.isResponseToMyMessage(msg.playerTurn)) await this.showErrorSignal();
+			this.movePiece(msg.previousPos, msg.newPos);
+			this.boardStructure[msg.newPos[0]][msg.newPos[1]].content.set(msg.pawnUpgrade);
+		}
+
+		this.fromBlock.set(null)
+		this.toBlock.set(null)
+		this.toBlockPrevContent = ""
 	}
 
 	dropPrevData(event: MouseEvent | null) {
@@ -185,13 +190,13 @@ export class Board {
 
 	setTypeOfMovement(blockSelected: preBlock) {
 		if (["wK", "bK"].includes(this.fromBlock()?.content() || "") && ["wR", "bR"].includes(blockSelected.content() || "")) {
-			this.typeOfMovement = "CASTLE";
+			this.typeOfMovement = this.CASTLE;
 		}
 		else if ((this.fromBlock()?.content() === "wP" && blockSelected.realPos[0] === 0) || 
 		(this.fromBlock()?.content() === "bP" && blockSelected.realPos[0] === 7)){
-			this.typeOfMovement = "PAWN_UPGRADE"
+			this.typeOfMovement = this.PAWN_UPGRADE
 		}
-		else this.typeOfMovement = "MOVE"
+		else this.typeOfMovement = this.MOVE
 
 		console.log("TYPE OF MOVE: ", this.typeOfMovement)
 	}
@@ -272,5 +277,12 @@ export class Board {
 		const map = [7,6,5,4,3,2,1,0];
 		return [map[vector[0]], vector[1]];
 
+	}
+
+	async showErrorSignal(){
+		const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+		this.showWarning.set(true)
+		await wait(750);
+		this.showWarning.set(false)
 	}
 }
