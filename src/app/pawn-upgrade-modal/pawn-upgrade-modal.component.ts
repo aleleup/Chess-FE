@@ -21,7 +21,7 @@ export class PawnUpgradeModalComponent {
 
     handlePieceSelected(pieceSelected: string) {
         console.log("PAWN UPGRADES TO: ", pieceSelected)
-        this.pieceSelected()?.set(pieceSelected);
+        this.pieceSelected()?.set(pieceSelected.slice(1)); // Ignoring index 0
         this.showModal()?.set(false);
     } 
 }

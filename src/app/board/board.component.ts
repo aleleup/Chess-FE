@@ -91,11 +91,21 @@ export class Board {
     
     async handlePositionClicked(realPos: number[]){
 		let relativePos = realPos;
+		console.log("New pos recived: " , realPos, relativePos)
+		
+		if (!this.isMyTurn()) return;
+
 		if (this.teamId() === 1) relativePos = this.reverseFirstIndex(realPos);
-      	console.log("New pos recived: " , realPos, relativePos)
 		const blockSelected: preBlock = this.boardStructure[relativePos[0]][relativePos[1]]
 		console.log("Block content: ", blockSelected.content());
+
+		if (this.fromBlock() === null &&
+			((this.teamId() === 0 && blockSelected.content().includes("b")) || 
+			(this.teamId() === 1 && blockSelected.content().includes("w")))
+		) return
+
 		if (this.fromBlock() === null && blockSelected.content()){
+			
 			this.fromBlock.set(blockSelected)
 			blockSelected.isSelected.set(true)	
 		}
@@ -134,7 +144,7 @@ export class Board {
     }
 	async handleBrodcastMessage(msg: BrodCastMessage){
 		if (msg.prevTypeOfMove === this.MOVE){
-			if (this.isResponseToMyMessage(msg.playerTurn) && !msg.wasLegalMove){
+			if (msg.playerTurn === this.teamId() && !msg.wasLegalMove){
 				
 				await this.showErrorSignal()
 				// Roll back to previous state.
@@ -158,15 +168,18 @@ export class Board {
 			}
 		}
 
-		if (msg.prevTypeOfMove === this.PAWN_UPGRADE && msg.wasLegalMove && msg.pawnUpgrade !== null) {
+		if (msg.prevTypeOfMove === this.PAWN_UPGRADE) {
 			if (!msg.wasLegalMove && this.isResponseToMyMessage(msg.playerTurn)) await this.showErrorSignal();
 			this.movePiece(msg.previousPos, msg.newPos);
-			this.boardStructure[msg.newPos[0]][msg.newPos[1]].content.set(msg.pawnUpgrade);
+			const pawnUpgrade = (msg.playerTurn + 1) % 2 === 0 ? `w${msg.pawnUpgrade}` : `b${msg.pawnUpgrade}`
+			const x = this.teamId() === 0 ? msg.newPos :  this.reverseFirstIndex(msg.newPos)
+			this.boardStructure[x[0]][x[1]].content.set(pawnUpgrade);
 		}
 
 		this.fromBlock.set(null)
 		this.toBlock.set(null)
 		this.toBlockPrevContent = ""
+		this.isMyTurn.set(msg.playerTurn === this.teamId())
 	}
 
 	dropPrevData(event: MouseEvent | null) {
@@ -267,10 +280,6 @@ export class Board {
 	isResponseToMyMessage(playerTurn: number): boolean {
 		// If player turn == (teamId + 1) % 2 => the message has been a success and now it is not my turn. 
 		return this.teamId() !== playerTurn;
-	}
-	reverseVector(vector: Array<number>) {
-		const map = [7,6,5,4,3,2,1,0];
-		return [map[vector[0]], map[vector[1]]];
 	}
 
 	reverseFirstIndex(vector: number[]) {

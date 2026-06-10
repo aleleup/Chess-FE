@@ -11,7 +11,9 @@ export class Block {
     blockColor = input<string>("");
     isSelected = input<WritableSignal<boolean>>(signal<boolean>(false));
     positionSetter = output<number[]>()
-
+    // x = {
+    //     wP: PawnComponent
+    // }
     showPosOnClick() {
         console.log(this.realPos())
         this.positionSetter.emit(this.realPos());

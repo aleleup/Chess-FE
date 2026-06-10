@@ -7,6 +7,10 @@
     display: grid ;
     place-items: center;
     position: fixed;  
+    text-align: center;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
 }
 
 /* .modal {
