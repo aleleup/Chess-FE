@@ -1,31 +1,72 @@
 :host {
-    display: block;
-    position: fixed;  
-    height: 300px;
-    top:112px;
-    left: 108px;
-    width: 200px;
-    height: 200px;
-    max-width: 200px;
-    max-height: 200px;
-
-    background-color: black;
-    color: white;
-    display: grid;
-    place-items: center;
-}
-
-.piece-to-select{
-    border: 1px solid white;
-    background: #000;
-    color: white; 
-    width:100px;
-    height: 100px;
-
-}
-
-/* .piece-to-select :hover {
-    background:white;
-    color: black; 
+    width: 220px;
+    height: 220px;
     
-} */
+    /* Estética moderna combinada con #1e1e1e */
+    background: rgba(25, 25, 25, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    
+    /* Esquinas suaves y sombras profundas */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px; 
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8);
+    
+    /* Alineación interna */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+}
+
+/* Contenedor del bucle @for de filas */
+:host > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Separación sutil entre filas */
+}
+
+/* Las filas generadas por tu bucle */
+:host > div > div {
+    display: flex;
+    flex-direction: row;
+    gap: 10px; /* Separación sutil entre botones */
+}
+
+.piece-to-select {
+    /* Menos punzante: Bordes semi-transparentes y esquinas redondeadas */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    color: #e0e0e0; 
+    
+    font-family: system-ui, -apple-system, sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    
+    width: 90px;
+    height: 90px;
+    border-radius: 10px;
+    cursor: pointer;
+    
+    /* Animación suave para el hover y active */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* CORREGIDO: Sin el espacio en blanco para que actúe sobre el botón */
+.piece-to-select:hover {
+    background: rgba(255, 255, 255, 0.95);
+    color: #121212; 
+    border-color: #ffffff;
+    /* Efecto pop sutil */
+    transform: scale(1.04); 
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Efecto feedback al hacer click */
+.piece-to-select:active {
+    transform: scale(0.96);
+}

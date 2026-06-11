@@ -1,0 +1,9 @@
+<div>
+    <h1>GAME OVER</h1>
+    @if(isTie()) {
+        <h2>TIE</h2>
+    } @else{
+        <h2>{{winnerColor}} WINS</h2>
+    }
+    {{reasson()}}
+</div>

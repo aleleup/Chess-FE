@@ -1,12 +1,13 @@
 import { Component, signal, inject } from '@angular/core';
-import { preBlock, Message, BrodCastMessage, ConnectionMessage } from '../types';
+import { preBlock, Message, BrodCastMessage, ConnectionMessage, GameOverData } from '../types';
 import { Block } from '../Block/block.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PawnUpgradeModalComponent } from '../pawn-upgrade-modal/pawn-upgrade-modal.component';
 import { WebsocketService } from '../../Services/WebSocket.service';
+import { GameOverModalComponent } from '../game-over-modal/game-over-modal.component';
 @Component({
   selector: 'board',
-  imports: [Block, PawnUpgradeModalComponent],
+  imports: [Block, PawnUpgradeModalComponent, GameOverModalComponent],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css'
 })
@@ -33,6 +34,9 @@ export class Board {
 	MOVE = "MOVE";
 	CASTLE = "CASTLE";
 	PAWN_UPGRADE = "PAWN_UPGRADE";
+
+	gameOverData: GameOverData | null = null;  
+	isGameOver = signal<boolean>(false) 
 	constructor() {
 		this.wsService.init("/board");
 
@@ -143,6 +147,13 @@ export class Board {
 
     }
 	async handleBrodcastMessage(msg: BrodCastMessage){
+
+		if (msg.gameOverData !== null) {
+			this.isGameOver.set(true);
+			this.gameOverData = msg.gameOverData;
+			this.wsService.disconnect()
+		}
+
 		if (msg.prevTypeOfMove === this.MOVE){
 			if (msg.playerTurn === this.teamId() && !msg.wasLegalMove){
 				

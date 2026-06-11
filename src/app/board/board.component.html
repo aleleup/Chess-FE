@@ -1,27 +1,35 @@
-@if(showBoard()){
-    <div (disable)="isMyTurn()">
-        <div (contextmenu)="dropPrevData($event)">
-            @for(row of boardStructure; track boardStructure.indexOf(row)) {
-                <div class="row">
-                    @for(blockData of row; track $index) { 
-                        <block [blockColor]="blockData.color" [realPos]="blockData.realPos" [content]="blockData.content" [isSelected]="blockData.isSelected"
-                        (positionSetter)="handlePositionClicked($event) "/>
-                    }
+<div class="board">
+    @if( showBoard()){
+     <!-- @if(true){ -->
+        <div (disable)="isMyTurn()">
+            <div (contextmenu)="dropPrevData($event)">
+                @for(row of boardStructure; track boardStructure.indexOf(row)) {
+                    <div class="row">
+                        @for(blockData of row; track $index) { 
+                            <block [blockColor]="blockData.color" [realPos]="blockData.realPos" [content]="blockData.content" [isSelected]="blockData.isSelected"
+                            (positionSetter)="handlePositionClicked($event) "/>
+                        }
 
+                    </div>
+
+                }
+            </div>
+            @if (showWarning()) { <span> Not legal Move!! </span> } 
+            <!-- TODO add style  -->
+            @if(showPawnUpgradeModal()) {
+                <div class="modal">
+                    <pawn-upgrade-modal [showModal]="showPawnUpgradeModal" [pieceSelected]="pawnUpgrade" [teamId]="teamId()"/>
                 </div>
-
+            }
+            @if(isGameOver()) {
+                <game-over-modal [isTie]="gameOverData?.isTie" [winnerId]="gameOverData?.winnerId" [reasson]="gameOverData?.reasson"/>
             }
         </div>
-        @if (showWarning()) { <span> Not legal Move!! </span> } 
-        <!-- TODO add style  -->
-        @if(showPawnUpgradeModal()) {
-            <div class="modal">
-                <pawn-upgrade-modal [showModal]="showPawnUpgradeModal" [pieceSelected]="pawnUpgrade" [teamId]="teamId()"/>
-            </div>
-        }
-    </div>
 
-}
-@else{
-    <span> {{connectionMessage()}} </span>
-}
+    }
+    @else{
+        <div class="overlay-container">
+            <span class="board-status-banner">BOARD IS FULL</span>
+        </div>  
+    }
+</div>

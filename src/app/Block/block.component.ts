@@ -1,9 +1,11 @@
 import { Component, input, signal, output, WritableSignal } from "@angular/core";
+import { Piece } from "../piece/piece.component";
 
 @Component({
     selector: 'block',
     templateUrl: './block.component.html',
-    styleUrl: './block.component.css'
+    styleUrl: './block.component.css',
+    imports: [Piece]
 })
 export class Block {
     realPos = input<number[]>([]);

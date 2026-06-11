@@ -1,8 +1,7 @@
- * {display: grid ;
-    place-items: center;
-    position: fixed;  
-    text-align: center;
+:host {
     display: flex;
-    justify-content: center; 
-    align-items: center; 
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Asegura que tenga altura completa para centrar verticalmente */
+    background-color: #1e1e1e; /* Opcional: un fondo oscuro para que resalten las piezas */
 }

@@ -1,0 +1,80 @@
+:host {
+    /* Posicionamiento en el centro exacto del tablero */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000; /* Por encima de cualquier otra cosa */
+
+    /* Caja contenedora elegante */
+    width: 320px;
+    padding: 30px 24px;
+    background: #121212; /* Fondo sólido oscuro idéntico al otro menú */
+    border: 2px solid #ffffff; /* Borde blanco nítido */
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+
+    /* Tipografía y alineación */
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #ffffff;
+    text-align: center;
+
+    /* Animación de entrada imponente */
+    animation: scaleUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* El div contenedor interno del HTML */
+:host > div {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+/* Título principal: GAME OVER */
+h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    /* Un degradado sutil metálico para darle un toque premium */
+    background: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Subtítulo: Quién gana o Empate */
+h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #e0e0e0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 12px;
+    width: 100%;
+}
+
+/* El texto de la razón (reasson) abajo del todo */
+:host > div {
+    /* Aplicando estilo directamente al texto suelto */
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: #8a8a8a; /* Color gris suave para que no compita con los títulos */
+    line-height: 1.4;
+    letter-spacing: 0.5px;
+}
+
+/* Animación de escala limpia */
+@keyframes scaleUp {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -48%) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}

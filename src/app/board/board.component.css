@@ -1,22 +1,136 @@
-.row{
+/* El contenedor del componente ocupa toda la pantalla */
+:host {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; 
+    background-color: #1e1e1e; 
+}
+
+/* El tablero base */
+.board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr); 
+    grid-template-rows: repeat(8, 1fr);    
+    width: 80vmin;   
+    height: 80vmin;  
+    gap: 0;          
+    position: relative; 
+}
+
+/* Forzamos a los contenedores de Angular a ocupar todo el Grid */
+.board > div {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    width: 100%;
+    height: 100%;
+    position: relative; 
+}
+
+.board > div > div {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
     display: flex;
     flex-direction: row;
+    height: 12.5%; 
+    width: 100%;
 }
 
-.board{
-    display: grid ;
-    place-items: center;
-    position: fixed;  
-    text-align: center;
+/* --- CONTENEDORES INVISIBLES DE CENTRADO (Sin fondo oscuro ni blur) --- */
+.modal, .overlay-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    
     display: flex;
-    justify-content: center; 
-    align-items: center; 
+    justify-content: center;
+    align-items: center;
+    background: transparent; /* Completamente invisible */
+    pointer-events: none;    /* Evita bloquear clicks innecesarios */
 }
 
-/* .modal {
-    display: block;
-    position: sticky;  
-    height: 300px;
-    top:0px;
-    left: 0px;
-} */
+/* Forzamos a que los hijos directos sí reaccionen a los clicks */
+pawn-upgrade-modal, .board-status-banner {
+    pointer-events: auto;
+}
+
+/* --- CARD DE SELECCIÓN DE PIEZA (Fondo sólido e independiente) --- */
+pawn-upgrade-modal {
+    width: 220px;
+    height: 220px;
+    background: #121212; /* Fondo oscuro sólido solo para el cuadrito */
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px; 
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+}
+
+/* Estructura interna del modal */
+pawn-upgrade-modal > div,
+pawn-upgrade-modal > div > div {
+    display: flex;
+    gap: 10px;
+}
+pawn-upgrade-modal > div { flex-direction: column; }
+pawn-upgrade-modal > div > div { flex-direction: row; }
+
+/* Botones de las piezas */
+.piece-to-select {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0; 
+    font-family: system-ui, -apple-system, sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    width: 90px;
+    height: 90px;
+    border-radius: 12px; 
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.piece-to-select:hover {
+    background: #ffffff;
+    color: #121212; 
+    border-color: #ffffff;
+    transform: scale(1.05); 
+}
+
+.piece-to-select:active {
+    transform: scale(0.95);
+}
+
+/* --- BANNER "BOARD IS FULL" (Limpio y flotante) --- */
+.board-status-banner {
+    font-size: 2.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 4px; 
+    color: #ffffff;
+    white-space: nowrap;
+    padding: 20px 40px;
+    background: #121212; /* Fondo sólido propio */
+    border: 2px solid #ffffff; 
+    border-radius: 4px; 
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    animation: popIn 0.3s ease forwards;
+}
+
+@keyframes popIn {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+}

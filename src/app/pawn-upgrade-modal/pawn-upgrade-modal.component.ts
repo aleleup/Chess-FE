@@ -1,8 +1,9 @@
 import { Component, WritableSignal, input, } from '@angular/core';
+import { Piece } from '../piece/piece.component';
 
 @Component({
   selector: 'pawn-upgrade-modal',
-  imports: [],
+  imports: [Piece],
   templateUrl: './pawn-upgrade-modal.component.html',
   styleUrl: './pawn-upgrade-modal.component.css'
 })
