@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PawnUpgradeModalComponent } from '../pawn-upgrade-modal/pawn-upgrade-modal.component';
 import { WebsocketService } from '../../Services/WebSocket.service';
 import { GameOverModalComponent } from '../game-over-modal/game-over-modal.component';
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'board',
   imports: [Block, PawnUpgradeModalComponent, GameOverModalComponent],
@@ -37,6 +38,15 @@ export class Board {
 
 	gameOverData: GameOverData | null = null;  
 	isGameOver = signal<boolean>(false) 
+	private route = inject(ActivatedRoute);
+	sessionId: string | null = '';
+
+
+	ngOnInit() {
+		this.sessionId = this.route.snapshot.paramMap.get('id');
+		console.log('El ID de la sesión es:', this.sessionId);
+  	}
+
 	constructor() {
 		this.wsService.init("/board");
 

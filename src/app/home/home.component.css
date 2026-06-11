@@ -1,0 +1,95 @@
+:host {
+    /* Centrado absoluto en toda la pantalla */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #1e1e1e; /* El mismo fondo oscuro del juego */
+    
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #ffffff;
+    gap: 20px; /* Separación limpia entre elementos */
+    padding: 20px;
+}
+
+/* Título: Own Session */
+h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    color: #f0f0f0;
+    text-align: center;
+}
+
+/* Input numérico */
+input[type="number"] {
+    width: 260px;
+    padding: 14px 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    color: #ffffff;
+    background: #121212; /* Fondo sólido oscuro como los modales */
+    
+    /* Bordes sutiles y elegantes */
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    
+    outline: none;
+    transition: all 0.25s ease;
+}
+
+/* Efecto cuando el usuario hace clic en el input */
+input[type="number"]:focus {
+    border-color: #ffffff; /* El borde se ilumina a blanco puro */
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1); /* Brillo sutil */
+    transform: translateY(-1px);
+}
+
+/* Ocultar las flechas nativas incómodas de los inputs de tipo número */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Botón: Enter Board */
+button {
+    width: 260px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    
+    /* Inversión de color: Botón blanco, texto oscuro */
+    background-color: #ffffff;
+    color: #121212;
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Efecto Hover del botón */
+button:hover {
+    background-color: transparent;
+    color: #ffffff;
+    border-color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Efecto Click */
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
