@@ -190,11 +190,13 @@ export class Board {
 		}
 
 		if (msg.prevTypeOfMove === this.PAWN_UPGRADE) {
-			if (!msg.wasLegalMove && this.isResponseToMyMessage(msg.playerTurn)) await this.showErrorSignal();
-			this.movePiece(msg.previousPos, msg.newPos);
-			const pawnUpgrade = (msg.playerTurn + 1) % 2 === 0 ? `w${msg.pawnUpgrade}` : `b${msg.pawnUpgrade}`
-			const x = this.teamId() === 0 ? msg.newPos :  this.reverseFirstIndex(msg.newPos)
-			this.boardStructure[x[0]][x[1]].content.set(pawnUpgrade);
+			if (!msg.wasLegalMove && this.isResponseToMyMessage(msg.playerTurn)){ await this.showErrorSignal()}
+			if(msg.wasLegalMove) {
+				this.movePiece(msg.previousPos, msg.newPos);
+				const pawnUpgrade = (msg.playerTurn + 1) % 2 === 0 ? `w${msg.pawnUpgrade}` : `b${msg.pawnUpgrade}`
+				const x = this.teamId() === 0 ? msg.newPos :  this.reverseFirstIndex(msg.newPos)
+				this.boardStructure[x[0]][x[1]].content.set(pawnUpgrade);
+			}
 		}
 
 		this.fromBlock.set(null)

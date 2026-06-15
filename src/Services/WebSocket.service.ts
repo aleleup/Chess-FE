@@ -2,6 +2,7 @@ import { Injectable, signal, inject, PLATFORM_ID, WritableSignal } from '@angula
 import { isPlatformBrowser } from '@angular/common'; // <- Importante
 import { Observable, EMPTY, Subject } from 'rxjs';
 import { catchError, retry, tap } from 'rxjs/operators';
+import { BASE_URL } from '../enviroment.dev';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,6 @@ import { catchError, retry, tap } from 'rxjs/operators';
 export class WebsocketService {
     teamId: WritableSignal<number> | null = null
     private socket$!: WebSocketSubject<Object>;
-    private readonly BASE_URL = 'http://localhost:7070'; 
     private WS_URL = "";
     // Conection state exposed as a signal
     public isConnected = signal<boolean>(false);
@@ -57,7 +57,7 @@ export class WebsocketService {
         console.log("RISING WEB SOCKET");
     }
     public async init(route: string) {
-        this.WS_URL = this.BASE_URL + route;
+        this.WS_URL = BASE_URL + route;
         console.log("REQUIREMENTS COMPLETED: ", this.WS_URL);
         if (this.isBrowser) {
             this.connect();
